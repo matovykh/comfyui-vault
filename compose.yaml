@@ -1,0 +1,18 @@
+services:
+  comfy-vault:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8088:8088"
+    environment:
+      VAULT_HOST_HOME: ${HOME}
+      VAULT_HOST_DATA_DIR: ${VAULT_DATA_DIR:-${HOME}/ComfyUI_Vault}
+    volumes:
+      - type: bind
+        source: ${VAULT_DATA_DIR:-${HOME}/ComfyUI_Vault}
+        target: /data
+      # Folder selection, backup and repository switching within the user's home.
+      - type: bind
+        source: ${HOME}
+        target: /repositories
+    stop_grace_period: 60s

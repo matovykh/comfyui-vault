@@ -1,0 +1,6 @@
+{
+  "url": "http://127.0.0.1:8088",
+  "hash_models": true,
+  "timeout": 600,
+  "extra_input_roots": []
+}

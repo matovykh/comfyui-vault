@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101113"><title>Comfy Vault · Архив генераций</title><link rel="stylesheet" href="/static/style.css"><script src="/static/i18n.js" defer></script><script src="/static/app.js" defer></script></head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/" aria-label="Comfy Vault"><span class="brand-symbol">◈</span><span>comfy<span class="brand-light">vault</span><small>АРХИВ ПРОЦЕССА</small></span></a>
+  <div class="side-heading"><span>Библиотека</span><button class="icon-button" id="add-group" aria-label="Создать группу"><span data-icon="plus"></span></button></div>
+  <nav id="projects" aria-label="Проекты"></nav>
+  <button id="settings" class="button secondary"><span data-icon="settings"></span>Настройки</button><div class="side-bottom"><span class="status-dot"></span><div class="storage-location"><span>Локальное хранилище</span><span id="repository-location" class="repository-location" data-user aria-live="polite">Загрузка…</span></div></div>
+</aside>
+<main>
+  <header class="topbar"><div class="breadcrumb">Библиотека <span>/</span> <b id="breadcrumb-project">Все проекты</b></div><div class="quick-settings"><div id="theme"></div><select id="language" aria-label="Язык"><option value="ru">Русский</option><option value="en">English</option><option value="zh">中文</option></select><button class="button secondary compact" id="setup">Подключить ComfyUI <span>↗</span></button></div></header>
+  <section class="workspace">
+    <div id="project-header" class="project-header"></div>
+    <div class="artifact-heading"><span class="eyebrow">АРТЕФАКТЫ</span><button class="text-button" id="add-artifact">+ Новый артефакт</button></div>
+    <div id="artifacts"></div>
+    <section id="artifact-header"></section>
+    <div id="toolbar" class="toolbar"><label class="search"><span data-icon="search"></span><input id="search" type="search" placeholder="Промпт, модель, seed или заметка…" aria-label="Поиск версий"></label><button id="favorites" class="button secondary compact" aria-pressed="false">☆ Показать избранное</button><select id="sort" aria-label="Порядок версий"><option value="desc">Сначала новые</option><option value="asc">Сначала старые</option></select></div>
+    <section id="versions" class="timeline" aria-live="polite"></section>
+  </section>
+  <footer>COMFY VAULT <span>Процесс заслуживает сохранения.</span><span id="version-count"></span></footer>
+</main>
+<dialog id="form-dialog" class="form-dialog"><form id="entity-form"><div class="dialog-heading"><h2 id="form-title"></h2><button type="button" class="icon-button" data-close="form-dialog" aria-label="Закрыть">×</button></div><label id="name-label">Название<input id="entity-name" maxlength="160" required autocomplete="off"></label><label>Описание<textarea id="entity-description" rows="5" maxlength="20000" placeholder="Контекст, идея и то, чего хочется добиться"></textarea></label><label id="type-label">Тип артефакта<select id="entity-type"><option value="photo">Изображение</option><option value="video">Видео</option></select></label><p class="muted small" id="form-hint"></p><div class="dialog-actions"><button type="button" class="button secondary" data-close="form-dialog">Отмена</button><button class="button primary" type="submit">Сохранить</button></div></form></dialog>
+<dialog id="detail-dialog" class="detail-dialog"><div id="detail-content"></div></dialog>
+<dialog id="help-dialog" class="help-dialog"><div class="dialog-heading"><span class="eyebrow">НАЧАЛО РАБОТЫ</span><button class="icon-button" data-close="help-dialog" aria-label="Закрыть">×</button></div><h2>Генерируйте в ComfyUI.<br>Сохраняйте процесс здесь.</h2><p class="muted">Каждый запуск — новая версия внутри выбранного проекта и артефакта.</p><ol class="steps"><li><b>Установите ноду</b><p>Скачайте пакет, распакуйте папку <code>comfyui_vault</code> в <code>ComfyUI/custom_nodes/</code> и перезапустите ComfyUI.</p><a class="button secondary" href="/api/node-package">Скачать custom node ↓</a></li><li><b>Добавьте Archive Images в workflow</b><p>Нода находится в категории <code>Comfy Vault</code>. Подключите готовое изображение: после Save Image, если у него есть IMAGE-выход, либо напрямую после декодирования. Укажите названия проекта и артефакта.</p></li><li><b>Запустите генерацию</b><p>Нода отправит файлы в <code>http://127.0.0.1:8088</code>. Проект, артефакт и номер версии создадутся автоматически. Обновите список кнопкой рядом с историей.</p></li></ol><div class="callout">Для видео используйте <b>Archive Files</b>: путь к готовому файлу или выход <code>VHS_FILENAMES</code>. Веса моделей не копируются. При ручном восстановлении скачайте файлы версии и проверьте список моделей и custom nodes.</div></dialog>
+<dialog id="confirm-dialog" aria-labelledby="confirm-title" class="form-dialog"><h2 id="confirm-title"></h2><p id="confirm-message"></p><div class="dialog-actions"><button id="confirm-cancel" class="button primary" autofocus>Отмена</button><button id="confirm-delete" class="button danger">Удалить</button></div></dialog>
+<dialog id="media-dialog" aria-labelledby="media-title" class="media-dialog"><div class="media-top"><button id="media-prev" class="button">←</button><h2 id="media-title"></h2><button id="media-next" class="button">→</button><button class="button" data-close="media-dialog">×</button></div><div id="media-stage"></div><div class="media-tools"><button id="media-size" class="button">1:1 / Вписать</button><a id="media-original" class="button" target="_blank" rel="noopener">Оригинал ↗</a></div></dialog>
+<dialog id="directory-dialog" class="form-dialog"><h2>Выбрать каталог</h2><input id="directory-path" aria-label="Путь"><button id="directory-go" class="button">Открыть</button><div id="directory-list"></div><div class="dialog-actions"><button class="button" data-close="directory-dialog">Отмена</button><button id="directory-select" class="button primary">Выбрать</button></div></dialog>
+<div id="toast" role="status"></div>
+</body></html>
